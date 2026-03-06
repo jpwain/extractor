@@ -1,6 +1,17 @@
 javascript: (function () {
+    // 0. Set a unique ID for our lightbox
+    var overlayId = 'image-extractor-bookmarklet-overlay';
+
+    // Check if an overlay already exists and remove it to prevent stacking
+    var existingOverlay = document.getElementById(overlayId);
+    if (existingOverlay) {
+        document.body.removeChild(existingOverlay);
+        // We do not need to restore originalBodyOverflow here because we are immediately opening a new one
+    }
+
     // 1. Create a full-screen overlay for the lightbox
     var overlay = document.createElement('div');
+    overlay.id = overlayId;
 
     // Apply CSS styles to make it a fixed, semi-transparent modal covering the screen
     overlay.style.position = 'fixed';
@@ -19,6 +30,10 @@ javascript: (function () {
     overlay.style.flexWrap = 'wrap';
     overlay.style.justifyContent = 'center';
     overlay.style.alignItems = 'center';
+
+    // Prevent scrolling on the underlying page
+    var originalBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
 
     // Append the overlay to the document body
     document.body.appendChild(overlay);
@@ -61,6 +76,9 @@ javascript: (function () {
         // Only close if the click was directly on the background (not on a child thumbnail)
         if (event.target === overlay) {
             document.body.removeChild(overlay);
+
+            // Restore original scrolling behavior on the body
+            document.body.style.overflow = originalBodyOverflow;
         }
     });
 })();
